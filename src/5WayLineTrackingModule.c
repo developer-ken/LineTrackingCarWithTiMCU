@@ -92,7 +92,8 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
         {
             CurrentState = Straight;
         }
-    }else if (left != pinConfig.TriggerLevel &&
+    }
+    else if (left != pinConfig.TriggerLevel &&
              (lmiddle == pinConfig.TriggerLevel ||
               middle == pinConfig.TriggerLevel ||
               rmiddle == pinConfig.TriggerLevel) &&
