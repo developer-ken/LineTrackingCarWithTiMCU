@@ -7,8 +7,8 @@ class Vector2d;
 class PoleVector2d
 {
 public:
+    PoleVector2d();
     PoleVector2d(double angle, double distance);
-    ~PoleVector2d();
     Vector2d VectorDistanceTo(PoleVector2d p);
     Vector2d VectorDistanceTo(Vector2d p);
     double AbsDistanceTo(PoleVector2d p);
@@ -21,7 +21,6 @@ class Vector2d
 {
 public:
     Vector2d(double x, double y);
-    ~Vector2d();
     PoleVector2d ToPoleVect();
     Vector2d VectorDistanceTo(PoleVector2d p);
     Vector2d VectorDistanceTo(Vector2d p);

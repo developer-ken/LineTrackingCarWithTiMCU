@@ -7,6 +7,12 @@ PoleVector2d::PoleVector2d(double angle, double distance)
     Distance = distance;
 }
 
+PoleVector2d::PoleVector2d()
+{
+    Angle = 0;
+    Distance = 0;
+}
+
 Vector2d PoleVector2d::ToLinearVect()
 {
     return Vector2d(Distance * cos(Angle), Distance * sin(Angle));
@@ -38,18 +44,22 @@ double Vector2d::Length()
     return sqrt(X * X + Y * Y);
 }
 
-Vector2d Vector2d::VectorDistanceTo(PoleVector2d p){
+Vector2d Vector2d::VectorDistanceTo(PoleVector2d p)
+{
     return VectorDistanceTo(p.ToLinearVect());
 }
 
-Vector2d Vector2d::VectorDistanceTo(Vector2d p){
+Vector2d Vector2d::VectorDistanceTo(Vector2d p)
+{
     return Vector2d(p.X - X, p.Y - Y);
 }
 
-double Vector2d::AbsDistanceTo(PoleVector2d p){
+double Vector2d::AbsDistanceTo(PoleVector2d p)
+{
     return AbsDistanceTo(p.ToLinearVect());
 }
 
-double Vector2d::AbsDistanceTo(Vector2d p){
+double Vector2d::AbsDistanceTo(Vector2d p)
+{
     return VectorDistanceTo(p).Length();
 }
