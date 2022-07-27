@@ -1,6 +1,8 @@
 #include "UltraSonic.h"
 
-double MeasureOnce(uint8_t pin){
+double MeasureOnce(uint8_t pin)
+{
+    double duration;
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
     delayMicroseconds(2);
@@ -8,7 +10,6 @@ double MeasureOnce(uint8_t pin){
     delayMicroseconds(10);
     digitalWrite(pin, LOW);
     pinMode(pin, INPUT);
-    double duration = pulseIn(pin, HIGH);
-    double distance = duration / 29 / 2;
-    return distance;
+    duration = pulseIn(pin, HIGH, 100);
+    return duration ? duration / 29 / 2 : INFINITY;
 }
