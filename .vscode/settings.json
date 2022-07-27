@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "5waylinetrackingmodule.h": "c"
+        "5waylinetrackingmodule.h": "c",
+        "crc8.h": "c"
     }
 }
