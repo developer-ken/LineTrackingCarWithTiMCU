@@ -6,7 +6,7 @@
 struct
 {
     uint8_t Left, LMiddle, Middle, RMiddle, Right; // Pin numbers
-    uint8_t TriggerLevel;// HIGH or LOW
+    uint8_t TriggerLevel;                          // HIGH or LOW
 } typedef PinConfig5Way;
 
 enum
@@ -28,5 +28,5 @@ enum
     NoState = 10
 } typedef StateCommand;
 
-StateCommand LineTrackingScan(PinConfig5Way);
+StateCommand LineTrackingScan(PinConfig5Way, Loop);
 #endif
