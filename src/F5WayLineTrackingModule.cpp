@@ -13,106 +13,40 @@ StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
     uint8_t rmiddle = digitalRead(pinConfig.RMiddle);
     uint8_t right = digitalRead(pinConfig.Right);
 
-    // 基本巡线逻辑 —— 单传感器压线
-    if (left == pinConfig.TriggerLevel &&
-        lmiddle != pinConfig.TriggerLevel &&
-        middle != pinConfig.TriggerLevel &&
-        rmiddle != pinConfig.TriggerLevel &&
-        right != pinConfig.TriggerLevel) // ■□□□□
+    uint8_t contacts = left + lmiddle + middle + rmiddle + right;
+    if (pinConfig.TriggerLevel == LOW)
     {
-        CurrentState = RapidLeft;
-        IsAtCrossing = false;
-    }
-    else if (left != pinConfig.TriggerLevel &&
-             lmiddle != pinConfig.TriggerLevel &&
-             middle != pinConfig.TriggerLevel &&
-             rmiddle != pinConfig.TriggerLevel &&
-             right == pinConfig.TriggerLevel) // □□□□■
-    {
-        CurrentState = RapidRight;
-        IsAtCrossing = false;
-    }
-    else if (left != pinConfig.TriggerLevel &&
-             lmiddle == pinConfig.TriggerLevel &&
-             rmiddle != pinConfig.TriggerLevel &&
-             right != pinConfig.TriggerLevel &&
-             CurrentState != RapidLeft &&
-             CurrentState != RapidRight) // □■X□□
-    {
-        CurrentState = Left;
-        IsAtCrossing = false;
-    }
-    else if (left != pinConfig.TriggerLevel &&
-             lmiddle != pinConfig.TriggerLevel &&
-             rmiddle == pinConfig.TriggerLevel &&
-             right != pinConfig.TriggerLevel &&
-             CurrentState != RapidLeft &&
-             CurrentState != RapidRight) // □□X■□
-    {
-        CurrentState = Right;
-        IsAtCrossing = false;
-    }
-    else if (left != pinConfig.TriggerLevel &&
-             lmiddle != pinConfig.TriggerLevel &&
-             middle == pinConfig.TriggerLevel &&
-             rmiddle != pinConfig.TriggerLevel &&
-             right != pinConfig.TriggerLevel) // □□■□□
-    {
-        CurrentState = Straight;
-        IsAtCrossing = false;
+        contacts = 5 - contacts;
     }
 
-    // 特殊情况 —— 多传感器压线或无传感器压线
-    else if (left == pinConfig.TriggerLevel &&
-             lmiddle == pinConfig.TriggerLevel &&
-             middle == pinConfig.TriggerLevel &&
-             rmiddle == pinConfig.TriggerLevel &&
-             right == pinConfig.TriggerLevel) // ■■■■■
+    if (contacts > 3)
     {
         CurrentState = CheckPoint;
-        IsAtCrossing = false;
+
+    }else if(contacts>1){
+        CurrentState = 
     }
-    else if (left != pinConfig.TriggerLevel &&
-             lmiddle != pinConfig.TriggerLevel &&
-             middle != pinConfig.TriggerLevel &&
-             rmiddle != pinConfig.TriggerLevel &&
-             right != pinConfig.TriggerLevel &&
-             CurrentState != RapidLeft &&
-             CurrentState != RapidRight) // □□□□□
+
+    if (left == pinConfig.TriggerLevel)
     {
-        CurrentState = Pause_Straight_Loss;
-        IsAtCrossing = false;
+        CurrentState = RapidLeft;
     }
-    else if (left == pinConfig.TriggerLevel &&
-             (lmiddle == pinConfig.TriggerLevel ||
-              middle == pinConfig.TriggerLevel ||
-              rmiddle == pinConfig.TriggerLevel) &&
-             right != pinConfig.TriggerLevel) // ■+++□  岔路
+    else if (right == pinConfig.TriggerLevel)
     {
-        IsAtCrossing = true;
-        if (loop == Inner)
-        {
-            CurrentState = RapidLeft;
-        }
-        else
-        {
+        CurrentState = RapidRight;
+    }
+    if (lmiddle == pinConfig.TriggerLevel)
+    {
+        CurrentState = Left;
+    }
+    else if (rmiddle == pinConfig.TriggerLevel)
+    {
+        CurrentState = Right;
+    }
+    else if (middle == pinConfig.TriggerLevel)
+    {
+        if (CurrentState == Left || CurrentState == Right)
             CurrentState = Straight;
-        }
     }
-    else if (left != pinConfig.TriggerLevel &&
-             (lmiddle == pinConfig.TriggerLevel ||
-              middle == pinConfig.TriggerLevel ||
-              rmiddle == pinConfig.TriggerLevel) &&
-             right == pinConfig.TriggerLevel) // □+++■  岔路
-    {
-        IsAtCrossing = true;
-        if (loop == Inner)
-        {
-            CurrentState = RapidRight;
-        }
-        else
-        {
-            CurrentState = Straight;
-        }
-    }
+    return CurrentState;
 }

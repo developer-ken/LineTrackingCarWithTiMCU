@@ -22,6 +22,7 @@ public:
     PinConfig5Way Config;
     UpperStateMachine(PinConfig5Way);
     StateCmd state;
+    LineTraker tracker;
     StateCmd update();
     Loop goloop;
     uint8_t CountCrossing;
@@ -32,6 +33,5 @@ private:
     StateCommand LastState;
     int statetimer;
     bool AtCrossing;
-    LineTraker tracker;
 };
 #endif

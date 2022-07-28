@@ -24,13 +24,13 @@ enum StateCommand
     RapidRight = 2,
 
     CheckPoint = 3,
-    Pause_Straight_Loss = 4,
+    Pause_Or_Loss = 4,
     NoState = 10
 } typedef StateCommand;
 
 class LineTraker
 {
-    public:
+public:
     bool IsAtCrossing;
     StateCommand CurrentState;
     StateCommand LineTrackingScan(PinConfig5Way, Loop);

@@ -2,5 +2,6 @@
     "files.associations": {
         "5waylinetrackingmodule.h": "c",
         "crc8.h": "c"
-    }
+    },
+    "EIDE.SerialPortMonitor.BaudRate": 230400
 }

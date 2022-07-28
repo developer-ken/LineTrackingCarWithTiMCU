@@ -20,7 +20,7 @@ StateCmd UpperStateMachine::update()
     crossing = tracker.IsAtCrossing;
     if (LastState == CheckPoint && statec != CheckPoint)
     {
-        if (statec == Pause_Straight_Loss)
+        if (statec == Pause_Or_Loss)
         {
             state = PausePoint;
             CountPausePoint++;
@@ -37,7 +37,7 @@ StateCmd UpperStateMachine::update()
     }
     else
     {
-        if (statec == Pause_Straight_Loss)
+        if (statec == Pause_Or_Loss)
             state = Loss;
     }
     if (crossing && !AtCrossing)
