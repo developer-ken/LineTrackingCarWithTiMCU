@@ -2,10 +2,20 @@
 
 #include "LidarLd06.h"
 #include "Vectors.hpp"
-#include "5WayLineTrackingModule.h"
+#include "F5WayLineTrackingModule.hpp"
 #include "UltraSonic.h"
+#include "UpperStateMachine.h"
 
 LidarLd06 lidar;
+PinConfig5Way linetrackingCfg = {
+    .Left = 0,
+    .LMiddle = 1,
+    .Middle = 2,
+    .RMiddle = 3,
+    .Right = 4,
+    .TriggerLevel = HIGH};
+UpperStateMachine statemachine(linetrackingCfg);
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -15,5 +25,5 @@ void setup()
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
+  StateCmd cmd = statemachine.update();
 }

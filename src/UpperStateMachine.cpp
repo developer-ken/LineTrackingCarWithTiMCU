@@ -1,4 +1,5 @@
 #include "UpperStateMachine.h"
+#include "F5WayLineTrackingModule.hpp"
 
 UpperStateMachine::UpperStateMachine(PinConfig5Way Config)
 {
@@ -9,12 +10,14 @@ UpperStateMachine::UpperStateMachine(PinConfig5Way Config)
     CountCrossing = 0;
     CountPausePoint = 0;
     CountStopPoint = 0;
+    tracker = LineTraker();
 }
 
 StateCmd UpperStateMachine::update()
 {
     bool crossing = false;
-    StateCommand statec = LineTrackingScan(Config, goloop, &crossing);
+    StateCommand statec = tracker.LineTrackingScan(Config, goloop);
+    crossing = tracker.IsAtCrossing;
     if (LastState == CheckPoint && statec != CheckPoint)
     {
         if (statec == Pause_Straight_Loss)
@@ -47,4 +50,5 @@ StateCmd UpperStateMachine::update()
         AtCrossing = false;
     }
     LastState = statec;
+    return state;
 }

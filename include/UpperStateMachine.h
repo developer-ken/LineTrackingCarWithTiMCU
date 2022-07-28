@@ -1,7 +1,7 @@
 #ifndef _UPPERSTATEMACHINE_H_
 #define _UPPERSTATEMACHINE_H_
 #include <Arduino.h>
-#include "5WayLineTrackingModule.h"
+#include "F5WayLineTrackingModule.hpp"
 
 enum StateCmd
 {
@@ -32,5 +32,6 @@ private:
     StateCommand LastState;
     int statetimer;
     bool AtCrossing;
+    LineTraker tracker;
 };
 #endif

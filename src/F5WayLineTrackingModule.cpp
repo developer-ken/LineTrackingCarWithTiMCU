@@ -1,6 +1,5 @@
-#include "5WayLineTrackingModule.h"
-StateCommand CurrentState = NoState;
-StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop, bool *IsAtCrossing)
+#include "F5WayLineTrackingModule.hpp"
+StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
 {
     pinMode(pinConfig.Left, INPUT);
     pinMode(pinConfig.LMiddle, INPUT);

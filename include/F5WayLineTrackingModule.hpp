@@ -28,5 +28,11 @@ enum StateCommand
     NoState = 10
 } typedef StateCommand;
 
-StateCommand LineTrackingScan(PinConfig5Way, Loop, bool *);
+class LineTraker
+{
+    public:
+    bool IsAtCrossing;
+    StateCommand CurrentState;
+    StateCommand LineTrackingScan(PinConfig5Way, Loop);
+};
 #endif
