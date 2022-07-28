@@ -2,7 +2,7 @@
 
 #include "LidarLd06.h"
 #include "Vectors.hpp"
-#include "F5WayLineTrackingModule.hpp"
+#include "F5WayLineTrackingModule.h"
 #include "UltraSonic.h"
 #include "UpperStateMachine.h"
 
@@ -18,7 +18,6 @@ UpperStateMachine statemachine(linetrackingCfg);
 
 void setup()
 {
-  // put your setup code here, to run once:
   Serial.begin(115200);
   lidar.begin(Serial1, 230400);
 }
