@@ -13,7 +13,7 @@ enum StateCmd
 
     PausePoint = 3,
     StopPoint = 4,
-    Loss = 5
+    SLoss = 5
 } typedef StateCmd;
 
 class UpperStateMachine

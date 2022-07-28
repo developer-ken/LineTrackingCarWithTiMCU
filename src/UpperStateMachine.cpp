@@ -4,7 +4,7 @@
 UpperStateMachine::UpperStateMachine(PinConfig5Way Config)
 {
     this->Config = Config;
-    state = Loss;
+    state = SLoss;
     goloop = Inner;
     AtCrossing = false;
     CountCrossing = 0;
@@ -20,7 +20,7 @@ StateCmd UpperStateMachine::update()
     crossing = tracker.IsAtCrossing;
     if (LastState == CheckPoint && statec != CheckPoint)
     {
-        if (statec == Pause_Or_Loss)
+        if (statec == Loss)
         {
             state = PausePoint;
             CountPausePoint++;
@@ -37,8 +37,8 @@ StateCmd UpperStateMachine::update()
     }
     else
     {
-        if (statec == Pause_Or_Loss)
-            state = Loss;
+        if (statec == Loss)
+            state = SLoss;
     }
     if (crossing && !AtCrossing)
     {

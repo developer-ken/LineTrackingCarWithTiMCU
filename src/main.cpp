@@ -10,8 +10,8 @@
 //#define AUTO_TUNE_PID
 
 LidarLd06 lidar;
-Motor motorL(MotorConfig{39, 38, 37, 2, 3, 1, 0.1, 0.1, true});
-Motor motorR(MotorConfig{34, 35, 36, 4, 5, 1, 0.1, 0.1, true});
+Motor motorL(MotorConfig{39, 38, 37, 6, 7, 1, 0.1, 0.1, true});
+Motor motorR(MotorConfig{34, 35, 36, 3, 5, 1, 0.1, 0.1, true});
 PinConfig5Way linetrackingCfg = {
     .Left = 26,
     .LMiddle = 27,
@@ -24,17 +24,24 @@ UpperStateMachine statemachine(linetrackingCfg);
 #ifndef AUTO_TUNE_PID
 void setup()
 {
-  Serial.begin(230400);
+  Serial1.begin(230400);
   // lidar.begin(Serial1, 230400);
   // motorL.Rotate(3);
   // motorR.Rotate(3);
 }
 
 StateCommand last;
+uint8_t loopnum = 0;
 
 void loop()
 {
-  StateCommand cmd = statemachine.tracker.LineTrackingScan(linetrackingCfg, statemachine.goloop);
+  StateCommand cmd = statemachine.tracker.LineTrackingScan(linetrackingCfg, (Loop)(loopnum % 2));
+  // if (loopnum >= 4)
+  //{
+  //   motorL.RunPwm(0);
+  //   motorR.RunPwm(0);
+  //   return;
+  // }
   if (last != cmd)
     switch (cmd)
     {
@@ -54,6 +61,14 @@ void loop()
       motorL.RunPwm(90);
       motorR.RunPwm(10);
       break;
+    case Pause:
+      motorL.RunPwm(0);
+      motorR.RunPwm(0);
+      delay(3000);
+      motorL.RunPwm(90);
+      motorR.RunPwm(90);
+    case CheckPoint:
+      loopnum++;
     case Straight:
     default:
       motorL.RunPwm(90);

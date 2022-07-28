@@ -22,31 +22,49 @@ StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
     if (contacts > 3)
     {
         CurrentState = CheckPoint;
-
-    }else if(contacts>1){
-        CurrentState = 
+        IsAtCrossing = false;
     }
-
-    if (left == pinConfig.TriggerLevel)
+    else if (contacts > 1)
     {
-        CurrentState = RapidLeft;
+        if (loop == Inner)
+            CurrentState = RapidLeft;
+        else
+            CurrentState = Right;
+        IsAtCrossing = true;
     }
-    else if (right == pinConfig.TriggerLevel)
+    else if (contacts == 0)
     {
-        CurrentState = RapidRight;
+        if (CurrentState == CheckPoint)
+            CurrentState = Pause;
     }
-    if (lmiddle == pinConfig.TriggerLevel)
+    else
     {
-        CurrentState = Left;
-    }
-    else if (rmiddle == pinConfig.TriggerLevel)
-    {
-        CurrentState = Right;
-    }
-    else if (middle == pinConfig.TriggerLevel)
-    {
-        if (CurrentState == Left || CurrentState == Right)
-            CurrentState = Straight;
+        if (left == pinConfig.TriggerLevel)
+        {
+            CurrentState = RapidLeft;
+            IsAtCrossing = false;
+        }
+        else if (right == pinConfig.TriggerLevel)
+        {
+            CurrentState = RapidRight;
+            IsAtCrossing = false;
+        }
+        if (lmiddle == pinConfig.TriggerLevel)
+        {
+            CurrentState = Left;
+            IsAtCrossing = false;
+        }
+        else if (rmiddle == pinConfig.TriggerLevel)
+        {
+            CurrentState = Right;
+            IsAtCrossing = false;
+        }
+        else if (middle == pinConfig.TriggerLevel)
+        {
+            if (CurrentState == Left || CurrentState == Right)
+                CurrentState = Straight;
+            IsAtCrossing = false;
+        }
     }
     return CurrentState;
 }
