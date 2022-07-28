@@ -24,7 +24,8 @@ enum StateCommand
     RapidRight = 2,
 
     CheckPoint = 3,
-    Pause_Or_Loss = 4,
+    Pause = 4,
+    Loss = 5,
     NoState = 10
 } typedef StateCommand;
 
@@ -34,5 +35,8 @@ public:
     bool IsAtCrossing;
     StateCommand CurrentState;
     StateCommand LineTrackingScan(PinConfig5Way, Loop);
+
+private:
+    uint16_t countdown;
 };
 #endif
