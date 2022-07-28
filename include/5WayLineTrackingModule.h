@@ -15,7 +15,7 @@ enum
     Outter = 1
 } typedef Loop;
 
-enum
+enum StateCommand
 {
     RapidLeft = -2,
     Left = -1,
@@ -28,5 +28,5 @@ enum
     NoState = 10
 } typedef StateCommand;
 
-StateCommand LineTrackingScan(PinConfig5Way, Loop);
+StateCommand LineTrackingScan(PinConfig5Way, Loop, bool *);
 #endif

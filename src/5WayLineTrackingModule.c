@@ -1,7 +1,6 @@
 #include "5WayLineTrackingModule.h"
 StateCommand CurrentState = NoState;
-
-StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
+StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop, bool *IsAtCrossing)
 {
     pinMode(pinConfig.Left, INPUT);
     pinMode(pinConfig.LMiddle, INPUT);
@@ -23,6 +22,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
         right != pinConfig.TriggerLevel) // ■□□□□
     {
         CurrentState = RapidLeft;
+        IsAtCrossing = false;
     }
     else if (left != pinConfig.TriggerLevel &&
              lmiddle != pinConfig.TriggerLevel &&
@@ -31,6 +31,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
              right == pinConfig.TriggerLevel) // □□□□■
     {
         CurrentState = RapidRight;
+        IsAtCrossing = false;
     }
     else if (left != pinConfig.TriggerLevel &&
              lmiddle == pinConfig.TriggerLevel &&
@@ -40,6 +41,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
              CurrentState != RapidRight) // □■X□□
     {
         CurrentState = Left;
+        IsAtCrossing = false;
     }
     else if (left != pinConfig.TriggerLevel &&
              lmiddle != pinConfig.TriggerLevel &&
@@ -49,6 +51,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
              CurrentState != RapidRight) // □□X■□
     {
         CurrentState = Right;
+        IsAtCrossing = false;
     }
     else if (left != pinConfig.TriggerLevel &&
              lmiddle != pinConfig.TriggerLevel &&
@@ -57,6 +60,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
              right != pinConfig.TriggerLevel) // □□■□□
     {
         CurrentState = Straight;
+        IsAtCrossing = false;
     }
 
     // 特殊情况 —— 多传感器压线或无传感器压线
@@ -67,6 +71,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
              right == pinConfig.TriggerLevel) // ■■■■■
     {
         CurrentState = CheckPoint;
+        IsAtCrossing = false;
     }
     else if (left != pinConfig.TriggerLevel &&
              lmiddle != pinConfig.TriggerLevel &&
@@ -77,6 +82,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
              CurrentState != RapidRight) // □□□□□
     {
         CurrentState = Pause_Straight_Loss;
+        IsAtCrossing = false;
     }
     else if (left == pinConfig.TriggerLevel &&
              (lmiddle == pinConfig.TriggerLevel ||
@@ -84,6 +90,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
               rmiddle == pinConfig.TriggerLevel) &&
              right != pinConfig.TriggerLevel) // ■+++□  岔路
     {
+        IsAtCrossing = true;
         if (loop == Inner)
         {
             CurrentState = RapidLeft;
@@ -99,6 +106,7 @@ StateCommand LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
               rmiddle == pinConfig.TriggerLevel) &&
              right == pinConfig.TriggerLevel) // □+++■  岔路
     {
+        IsAtCrossing = true;
         if (loop == Inner)
         {
             CurrentState = RapidRight;
