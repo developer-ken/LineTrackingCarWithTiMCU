@@ -9,7 +9,9 @@
 #include "Motor.h"
 #include "Logger.h"
 
-#define MAX_BASE_SPEED 90
+#define MAX_BASE_SPEED 55
+#define MIN_BASE_SPEED 20
+#define D_VELOCITY_RATIO 1.6
 
 //#define AUTO_TUNE_PID
 
@@ -30,6 +32,7 @@ UpperStateMachine statemachine(linetrackingCfg);
 
 bool update(void *argument);
 bool update_lidar(void *argument);
+bool reset_stat(void *argument);
 double closest_distance = INFINITY; // Deg = 200~320
 
 void setup()
@@ -44,11 +47,13 @@ void setup()
   // motorR.Rotate(3);
   timer.every(100, update);
   timer.every(5, update_lidar);
+  timer.every(500, reset_stat);
 }
 
 StateCommand last;
 uint8_t loopnum = 0;
 uint8_t basespeed = 70;
+bool flagstop = false;
 
 bool update(void *argument)
 {
@@ -61,22 +66,23 @@ bool update(void *argument)
     closest_distance = INFINITY;
   }
   Logger::Log(String(lidar.ClosestPoint.Angle) + "->" + String(lidar.ClosestPoint.Distance));
-  if(closest_distance <185){
-    basespeed = 0;
-    last = NoState;
-  }
-  if (closest_distance < 200 && basespeed > 0)
+  if (closest_distance < 210)
   {
-    basespeed--;
+    flagstop = true;
     last = NoState;
   }
-  else if (closest_distance > 200 && basespeed < MAX_BASE_SPEED)
+  else
   {
-    basespeed++;
-    last = NoState;
+    flagstop = false;
   }
-
-
+  if (closest_distance < 300 && basespeed > MIN_BASE_SPEED)
+  {
+    basespeed = (basespeed - 10) > MIN_BASE_SPEED ? (basespeed - 10) : MIN_BASE_SPEED;
+  }
+  else if (closest_distance > 250 && basespeed < MAX_BASE_SPEED)
+  {
+    basespeed = (basespeed + 5) < MAX_BASE_SPEED ? (basespeed + 5) : MAX_BASE_SPEED;
+  }
   return true;
 }
 
@@ -86,43 +92,60 @@ bool update_lidar(void *argument)
   return true;
 }
 
+bool reset_stat(void *argument)
+{
+  last = NoState;
+  return true;
+}
+
 void loop()
 {
+  if (basespeed < 0)
+    basespeed = 0;
+  int standbySpeed = (10.0 * basespeed / MAX_BASE_SPEED);
+  if (standbySpeed < 1)
+    standbySpeed = 0;
   timer.tick();
-  StateCommand cmd = statemachine.tracker.LineTrackingScan(linetrackingCfg, (Loop)(loopnum % 2));
+  if (flagstop)
+  {
+    motorL.RunPwm(0);
+    motorR.RunPwm(0);
+    return;
+  }
+  StateCommand cmd = statemachine.tracker.LineTrackingScan(linetrackingCfg, Inner);//(Loop)(loopnum % 2)
   if (last != cmd)
     switch (cmd)
     {
     case Left:
-      motorL.RunPwm(basespeed - 20);
-      motorR.RunPwm(basespeed + 10);
+      motorL.RunPwm(basespeed);
+      motorR.RunPwm(basespeed*D_VELOCITY_RATIO);
       break;
     case Right:
-      motorL.RunPwm(basespeed + 10);
-      motorR.RunPwm(basespeed - 20);
+      motorL.RunPwm(basespeed*D_VELOCITY_RATIO);
+      motorR.RunPwm(basespeed);
       break;
     case RapidLeft:
-      motorL.RunPwm(10);
-      motorR.RunPwm(basespeed + 10);
+      motorL.RunPwm(standbySpeed);
+      motorR.RunPwm(basespeed*D_VELOCITY_RATIO);
       digitalWrite(PB_2, 0);
       break;
     case RapidRight:
-      motorL.RunPwm(basespeed + 10);
-      motorR.RunPwm(10);
+      motorL.RunPwm(basespeed*D_VELOCITY_RATIO);
+      motorR.RunPwm(standbySpeed);
       break;
     case Pause:
       motorL.RunPwm(0);
       motorR.RunPwm(0);
       delay(3000);
-      motorL.RunPwm(basespeed + 10);
-      motorR.RunPwm(basespeed + 10);
+      motorL.RunPwm(basespeed*D_VELOCITY_RATIO);
+      motorR.RunPwm(basespeed*D_VELOCITY_RATIO);
     case CheckPoint:
       loopnum++;
       analogWrite(PB_2, 255 / 2);
     case Straight:
     default:
-      motorL.RunPwm(basespeed + 10);
-      motorR.RunPwm(basespeed + 10);
+      motorL.RunPwm(basespeed*D_VELOCITY_RATIO);
+      motorR.RunPwm(basespeed*D_VELOCITY_RATIO);
       break;
     }
   last = cmd;
