@@ -1,4 +1,6 @@
 #include "F5WayLineTrackingModule.h"
+#include "Logger.h"
+
 StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
 {
     pinMode(pinConfig.Left, INPUT);
@@ -19,26 +21,53 @@ StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
         contacts = 5 - contacts;
     }
 
-    if (contacts > 3)
+    if (contacts > 2)
     {
-        CurrentState = CheckPoint;
-        IsAtCrossing = false;
-    }
-    else if (contacts > 1)
-    {
-        if (loop == Inner)
-            CurrentState = RapidLeft;
+        if (CurrentState != CheckPoint && CurrentState != NoState)
+        {
+            CurrentState = CheckPoint;
+            IsAtCrossing = false;
+            Logger::Log("Cp");
+        }
         else
-            CurrentState = Right;
-        IsAtCrossing = true;
+        {
+            CurrentState = NoState;
+        }
+    }
+    else if (contacts > 1 && contacts <= 2)
+    {
+        if ((left == pinConfig.TriggerLevel && lmiddle != pinConfig.TriggerLevel) ||
+            (lmiddle == pinConfig.TriggerLevel && left != pinConfig.TriggerLevel && middle != pinConfig.TriggerLevel) ||
+            (middle == pinConfig.TriggerLevel && lmiddle != pinConfig.TriggerLevel && rmiddle != pinConfig.TriggerLevel) ||
+            (rmiddle == pinConfig.TriggerLevel && middle != pinConfig.TriggerLevel && right != pinConfig.TriggerLevel) ||
+            (right == pinConfig.TriggerLevel && rmiddle != pinConfig.TriggerLevel))
+        {
+            Logger::Log("Crossing..");
+            if (loop == Inner)
+            {
+                CurrentState = RapidLeft;
+                Logger::Log("Go in");
+            }
+            else
+            {
+                CurrentState = Right;
+                Logger::Log("Avoid");
+            }
+            IsAtCrossing = true;
+        }
     }
     else if (contacts == 0)
     {
+        // Logger::Log("C=0...");
         if (CurrentState == CheckPoint)
+        {
+            Logger::Log("Cp,Pause");
             CurrentState = Pause;
+        }
     }
     else
     {
+        // Logger::Log("Nrm");
         if (left == pinConfig.TriggerLevel)
         {
             CurrentState = RapidLeft;
