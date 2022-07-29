@@ -24,13 +24,10 @@ void LidarLd06::update()
         double len = ldlidar->distances[i];
         double ang = ldlidar->angles[i];
         // Logger::Log("----------distance:" + String(len));
-        if (len > 0)
-        {
-            //    Logger::Log("d" + String(len));
-            PoleVector2d point;
-            PoleVector2d pv2d = PoleVector2d(ang, len);
-            AddPoint(pv2d);
-        }
+        //    Logger::Log("d" + String(len));
+        PoleVector2d point;
+        PoleVector2d pv2d = PoleVector2d(ang, len);
+        AddPoint(pv2d);
     }
 }
 
@@ -38,7 +35,7 @@ void LidarLd06::AddPoint(PoleVector2d pv2d)
 {
     pcloudpointer = (1 + pcloudpointer) % 360;
     pointCloud[pcloudpointer] = pv2d;
-    if (ClosestPoint.Distance > pv2d.Distance && pv2d.Distance > 0.1 &&
+    if (ClosestPoint.Distance > pv2d.Distance &&
         pv2d.Angle >= 200 && pv2d.Angle <= 320)
     {
         ClosestPoint = pv2d;
