@@ -3,6 +3,7 @@
 
 StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
 {
+    StLock = Normal;
     pinMode(pinConfig.Left, INPUT);
     pinMode(pinConfig.LMiddle, INPUT);
     pinMode(pinConfig.Middle, INPUT);
@@ -15,6 +16,36 @@ StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
     uint8_t rmiddle = digitalRead(pinConfig.RMiddle);
     uint8_t right = digitalRead(pinConfig.Right);
 
+    if (StLock < 0)
+    {
+        rmiddle = !pinConfig.TriggerLevel;
+        middle = !pinConfig.TriggerLevel;
+    }
+    else if (StLock > 0)
+    {
+        lmiddle = !pinConfig.TriggerLevel;
+        middle = !pinConfig.TriggerLevel;
+    }
+    if (right == pinConfig.TriggerLevel && StLock == EnterLeftStage1)
+    {
+        StLock = EnterLeftStage2;
+        right = !pinConfig.TriggerLevel;
+    }
+    else if (right != pinConfig.TriggerLevel && StLock == EnterLeftStage2)
+    {
+        StLock = Normal;
+    }
+
+    if (left == pinConfig.TriggerLevel && StLock == EnterRightStage1)
+    {
+        StLock = EnterRightStage2;
+        left = !pinConfig.TriggerLevel;
+    }
+    else if (left != pinConfig.TriggerLevel && StLock == EnterRightStage2)
+    {
+        StLock = Normal;
+    }
+
     uint8_t contacts = left + lmiddle + middle + rmiddle + right;
     if (pinConfig.TriggerLevel == LOW)
     {
@@ -24,7 +55,7 @@ StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
     if (contacts > 2)
     {
         if (CurrentState != CheckPoint && CurrentState != NoState)
-        {
+        { 
             CurrentState = CheckPoint;
             IsAtCrossing = false;
             Logger::Log("Cp");
@@ -46,11 +77,13 @@ StateCommand LineTraker::LineTrackingScan(PinConfig5Way pinConfig, Loop loop)
             if (loop == Inner)
             {
                 CurrentState = RapidLeft;
+                StLock = EnterLeftStage1;
                 Logger::Log("Go in");
             }
             else
             {
-                CurrentState = Right;
+                StLock = EnterRightStage1;
+                CurrentState = RapidRight;
                 Logger::Log("Avoid");
             }
             IsAtCrossing = true;

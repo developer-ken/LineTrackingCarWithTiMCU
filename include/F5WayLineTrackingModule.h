@@ -29,12 +29,22 @@ enum StateCommand
     NoState = 10
 } typedef StateCommand;
 
+enum StateLock
+{
+    EnterLeftStage1 = -2,
+    EnterLeftStage2 = -1,
+    Normal = 0,
+    EnterRightStage2 = 1,
+    EnterRightStage1 = 2
+} typedef StateLock;
+
 class LineTraker
 {
 public:
     bool IsAtCrossing;
     StateCommand CurrentState;
     StateCommand LineTrackingScan(PinConfig5Way, Loop);
+    StateLock StLock;
 
 private:
     uint16_t countdown;
